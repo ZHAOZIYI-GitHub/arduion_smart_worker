@@ -16,7 +16,7 @@ int fengmingqi;
 
 #define fengmingqipin 3//·äÃùÆ÷pin
 
-#define Fengmingqi_Delay 20//·äÃùÆ÷º¯Êı×ÜÑÓÊ±(ÆµÂÊ)
+int Fengmingqi_Delay =20;//·äÃùÆ÷º¯Êı×ÜÑÓÊ±(ÆµÂÊ)
 
 #define QW1 4//ºìÍâ½øÃÅ
 
@@ -25,6 +25,8 @@ int fengmingqi;
 int QW3[2];//×´Ì¬´æ´¢
 
 #define menling 6//´¥Ãş´«¸ĞÆ÷pin 
+
+#define huayanpin 7//»ğÑæpin
 
 #define Guangqiang_Out A0
 
@@ -47,6 +49,8 @@ const char chare_Zhaoji[] = "Zhaoji";
 const char chare_Rumen[] = "Rumen";
 
 const char chare_Gethome[] = "Gethome";
+
+const char chare_Huoyan[] = "Huayan";
 
 void send_data_Tc_Outside()
 {
@@ -89,6 +93,13 @@ void send_data_Gethome()
 {
 	Serial.print("/1\n");
 	Serial.println(chare_Gethome);
+	Serial.print("/0\n");
+}
+
+void send_data_Fire()
+{
+	Serial.print("/1\n");
+	Serial.println(chare_Huoyan);
 	Serial.print("/0\n");
 }
 
@@ -351,6 +362,17 @@ void panduan()
 	else
 	{
 		CloseToWater(0);
+	}
+	if (digitalRead(huayanpin) == 1)
+	{
+		send_data_Fire();
+		fengmingqi = 1;
+		Fengmingqi_Delay = 1;
+	}
+	else
+	{
+		fengmingqi = 0;
+		Fengmingqi_Delay = 20;
 	}
 }
 
