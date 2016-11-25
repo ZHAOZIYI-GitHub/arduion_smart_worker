@@ -10,7 +10,7 @@ int TOF;//华氏度开关（1
 
 #define DHT11PIN_IN 2	//室内pin
 
-#define DHT11PIN_OUT 1	//室外pin
+#define DHT11PIN_OUT 8	//室外pin
 
 int fengmingqi;
 
@@ -22,11 +22,15 @@ int Fengmingqi_Delay =20;//蜂鸣器函数总延时(频率)
 
 #define QW2 5//红外远门
 
+int B_Getdoor;
+
 int QW3[2];//状态存储
 
 #define menling 6//触摸传感器pin 
 
-#define huayanpin 7//火焰pin
+#define HuoyanPin 7//火焰pin
+
+#define HUOYAN_MAX 512
 
 #define Guangqiang_Out A0
 
@@ -210,7 +214,8 @@ void PanduanQW()
 		if (yuanweizhi == 0)//在家
 		{
 			//位置不变
-			send_data_Getdoor();
+			B_Getdoor = 1;
+			//send_data_Getdoor();
 		}
 		else
 		{
@@ -363,7 +368,7 @@ void panduan()
 	{
 		CloseToWater(0);
 	}
-	if (digitalRead(huayanpin) == 1)
+	if (digitalRead(HuoyanPin) == 1)
 	{
 		send_data_Fire();
 		fengmingqi = 1;
@@ -382,6 +387,89 @@ void shuju()
 	fengmingqi1();
 }
 
+void NEW_serial()
+{
+	Serial.print(Temperaturer(0));//室内
+	Serial.print(" ");
+	Serial.print(Temperaturer(1));//室外
+	Serial.print(" ");
+	Serial.print(Humidity());//室
+	Serial.print(" ");
+	//1horse有人，
+	if (digitalRead(menling) == 1)
+	{
+		Serial.print("1");
+		Serial.print(" ");
+		fengmingqi=1;
+	}
+	else
+	{
+		Serial.print("0");
+		Serial.print(" ");
+		fengmingqi = 0;
+	}
+	if (QW3[0] == 1)
+	{
+		if (Weizhigaibian == 1)
+		{
+			//send_data_Tc_Outside();
+			if ((Temperature_geter(DHT11PIN_IN) - Temperature_geter(DHT11PIN_OUT)) >= 10)
+			{
+				Serial.print("1");
+				Serial.print(" ");
+			}
+			else if ((Temperature_geter(DHT11PIN_IN) - Temperature_geter(DHT11PIN_OUT)) <= -10)
+			{
+				Serial.print("0");
+				Serial.print(" ");
+			}
+			else
+			{
+			}
+		}
+
+	}
+	else 
+	{
+
+	}
+	//心情
+	if (QW3[1] == 2)
+	{
+		Serial.print("1");
+		Serial.print(" ");
+	}
+	else 
+	{
+		Serial.print("0");
+		Serial.print(" ");
+	}
+	//在家有人进？？
+	if (B_Getdoor == 1)
+	{
+		Serial.print(1);
+		B_Getdoor = 0;
+		Serial.print(" ");
+	}
+	else
+	{
+		Serial.print(0);
+		Serial.print(" ");
+	}
+	if (analogRead(HuoyanPin)>=HUOYAN_MAX)
+	{
+		Serial.print(1);
+		Serial.print(" ");
+	}
+	else
+	{
+		Serial.print(0);
+		Serial.print(" ");
+	}
+	Serial.println();
+	new_Delay(3000);
+}
+
 void setup()
 {
 	Serial.begin(9600);
@@ -393,5 +481,7 @@ void loop()
 {
 	fengmingqi1();
 	shuju();//数据初始化
-	panduan();//判断部分
+	//panduan();//判断部分
+	NEW_serial();//新输出部分
+	
 }
