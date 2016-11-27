@@ -474,7 +474,7 @@ void NEW_serial()
 			}
 			else if ((Temperature_geter(DHT11PIN_IN) - Temperature_geter(DHT11PIN_OUT)) <= -10)
 			{
-				Serial.print("0");
+				Serial.print("1");
 				Serial.print(" ");
 			}
 			else
@@ -485,7 +485,8 @@ void NEW_serial()
 	}
 	else 
 	{
-
+		Serial.print("0");
+		Serial.print(" ");
 	}
 	//心情
 	if (QW3[1] == 2)
@@ -583,6 +584,6 @@ void loop()
 	shuju();//数据初始化
 	//panduan();//判断部分
 	NEW_serial();//新输出部分
-	Debug();
+	//Debug();
 	
 }
