@@ -16,35 +16,43 @@ int fengmingqi;
 
 #define fengmingqipin 3//蜂鸣器pin
 
-#define Fengmingqi_Delay 20//蜂鸣器函数总延时(频率)
+#define Fengmingqi_Delay 50//蜂鸣器函数总延时(频率)
 
 #define QW1 4//红外进门
 
 #define QW2 5//红外远门
 
-int B_Getdoor;
+int B_Getdoor;//事实位置
 
 int QW3[2];//状态存储
 
 #define menling 6//触摸传感器pin 
 
-#define HuoyanPin 7//火焰pin
+#define HuoyanPin A3//火焰pin
+
+#define HUOYAN_MAX 100
 
 int fine_fengmingqi;
 
 #define fine_fengmingqi_delay 10   //火焰蜂鸣器延时
 
-#define HUOYAN_MAX 512
-
 #define Guangqiang_Out A0
 
 #define Guangqiang_In  A1
 
-#define GuangqiangMax 512
+#define GuangqiangMax 200
+
+int D_OpenTolight = 0;//开关
+
+int B_OpenTolight = 0;//变化
 
 #define Turang0shidu A2
 
-#define TurangshiduMax 512
+#define TurangshiduMax 700
+
+int D_OpenToWater=0;//开关
+
+int B_OpenToWater = 0;//变化
 
 const char chare_temperturer[] = "Temperture";
 
@@ -120,12 +128,14 @@ void new_Delay(int Delay)//延时函数
 
 void OpenToWater(int Plantnumber)
 {
-
+	D_OpenToWater = 1;
+	B_OpenToWater = 1;
 }
 
 void CloseToWater(int Plantnumber)
 {
-
+	D_OpenToWater = 2;
+	B_OpenToWater = 1;
 }
 
 int TurangshiduGeter(int Plantnumber)
@@ -151,12 +161,14 @@ int GuangqiangGeter(int room_s)
 
 void CloseChuanglian()
 {
-
+	D_OpenTolight = 1;
+	B_OpenTolight = 1;
 }
 
 void OpenLight()
 {
-
+	D_OpenTolight = 2;
+	B_OpenTolight = 1;
 }
 
 void QWI()    
@@ -244,14 +256,6 @@ double Fahrenheit(double celsius)     //摄氏温度度转化为华氏温度
 {
 	return 1.8 * celsius + 32;
 }
-
-
-
-
-
-
-
-
 
 //参数1为DHT11PIN_IN 和	DHT11PIN_OUT
 double Temperature_geter_doublt(int DHT11PIN)
@@ -403,7 +407,7 @@ void panduan()
 	{
 		fengmingqi = 0;
 	}
-	if (GuangqiangGeter(1) >= GuangqiangMax)
+	if (GuangqiangGeter(1) <= GuangqiangMax)
 	{
 		CloseChuanglian();
 	}
@@ -419,7 +423,7 @@ void panduan()
 	{
 		CloseToWater(0);
 	}
-	if (digitalRead(HuoyanPin) == 1)
+	if (analogRead(HuoyanPin) == 1)
 	{
 		send_data_Fire();
 		fine_fengmingqi = 1;
@@ -506,7 +510,7 @@ void NEW_serial()
 		Serial.print(0);
 		Serial.print(" ");
 	}
-	if (analogRead(HuoyanPin)>=HUOYAN_MAX)
+	if (analogRead(HuoyanPin)<=HUOYAN_MAX)
 	{
 		Serial.print(1);
 		Serial.print(" ");
@@ -518,6 +522,34 @@ void NEW_serial()
 		Serial.print(" ");
 		fine_fengmingqi = 0;
 	}
+	//1.2为变化，水闸动作,占1位
+	if (B_OpenToWater == 1)
+	{
+		B_OpenToWater = 0;
+		Serial.print(D_OpenToWater);//1为开始浇水，2为关闭,0为无动作
+		Serial.print(" ");
+		D_OpenToWater = 0;
+
+	}
+	else
+	{
+		Serial.print(0);
+		Serial.print(" ");
+	}
+	//1为变化，水闸动作,占1位
+	if (B_OpenTolight == 1)
+	{
+		B_OpenTolight = 0;
+		Serial.print(D_OpenTolight);//2为开灯，1为关窗帘,0为无动作
+		Serial.print(" ");
+		D_OpenTolight = 0;
+
+	}
+	else
+	{
+		Serial.print(0);
+		Serial.print(" ");
+	}
 	Serial.println();
 	new_Delay(3000);
 }
@@ -525,8 +557,17 @@ void NEW_serial()
 void Debug()
 {
 	Serial.print("(");
-	Serial.print(digitalRead(QW1), digitalRead(QW2));
-	Serial.print(")");
+	Serial.print(digitalRead(QW1));
+	Serial.print(" ");
+	Serial.print(digitalRead(QW2));
+	Serial.print(" ");
+	Serial.print(analogRead(A0));
+	Serial.print(" ");
+	Serial.print(analogRead(A3));
+	Serial.print(" ");
+	Serial.print(analogRead(A2));
+	Serial.print(")\n");
+
 }
 
 void setup()
@@ -542,5 +583,6 @@ void loop()
 	shuju();//数据初始化
 	//panduan();//判断部分
 	NEW_serial();//新输出部分
+	Debug();
 	
 }
