@@ -16,7 +16,7 @@ int fengmingqi;
 
 #define fengmingqipin 3//蜂鸣器pin
 
-int Fengmingqi_Delay =20;//蜂鸣器函数总延时(频率)
+#define Fengmingqi_Delay 20//蜂鸣器函数总延时(频率)
 
 #define QW1 4//红外进门
 
@@ -29,6 +29,10 @@ int QW3[2];//状态存储
 #define menling 6//触摸传感器pin 
 
 #define HuoyanPin 7//火焰pin
+
+int fine_fengmingqi;
+
+#define fine_fengmingqi_delay 10   //火焰蜂鸣器延时
 
 #define HUOYAN_MAX 512
 
@@ -241,8 +245,16 @@ double Fahrenheit(double celsius)     //摄氏温度度转化为华氏温度
 	return 1.8 * celsius + 32;
 }
 
+
+
+
+
+
+
+
+
 //参数1为DHT11PIN_IN 和	DHT11PIN_OUT
-double Temperature_geter(int DHT11PIN)
+double Temperature_geter_doublt(int DHT11PIN)
 {
 	int chk = DHT11.read(DHT11PIN);
 	if (TOF == 1)
@@ -253,9 +265,9 @@ double Temperature_geter(int DHT11PIN)
 	{
 		return DHT11.temperature;
 	}
-}//参数1为DHT11PIN_IN 和	DHT11PIN_OUT
+}
 
-double Temperaturer(int room_s)
+double Temperaturer_double(int room_s)
 {
 	if (room_s == 1)//OUTSIDE
 	{
@@ -267,15 +279,54 @@ double Temperaturer(int room_s)
 	}
 }
 
-double Humidity()
+double Humidity_double()
 {
 	int chk = DHT11.read(DHT11PIN_OUT);
 	return (float)DHT11.humidity;
 }
 
+//参数1为DHT11PIN_IN 和	DHT11PIN_OUT
+int Temperature_geter(int DHT11PIN)
+{
+	int chk = DHT11.read(DHT11PIN);
+	if (TOF == 1)
+	{
+		return (int)Fahrenheit(DHT11.temperature);
+	}
+	else
+	{
+		return (int)DHT11.temperature;
+	}
+}
+
+int Temperaturer(int room_s)
+{
+	if (room_s == 1)//OUTSIDE
+	{
+		return (int)Temperature_geter(DHT11PIN_OUT);
+	}
+	else
+	{
+		return (int)Temperature_geter(DHT11PIN_IN);
+	}
+}
+
+int Humidity()
+{
+	int chk = DHT11.read(DHT11PIN_OUT);
+	return (int)DHT11.humidity;
+}
+
 void fengmingqi1() 
 {
-	if (fengmingqi == 1)
+	if(fine_fengmingqi==1)
+	{
+		digitalWrite(fengmingqipin, 1);
+		delay(fine_fengmingqi_delay / 2);
+		digitalWrite(fengmingqipin, 0);
+		delay(fine_fengmingqi_delay / 2);
+	}
+	else if (fengmingqi == 1)
 	{
 		digitalWrite(fengmingqipin, 1);
 		delay(Fengmingqi_Delay/2);
@@ -371,13 +422,12 @@ void panduan()
 	if (digitalRead(HuoyanPin) == 1)
 	{
 		send_data_Fire();
-		fengmingqi = 1;
-		Fengmingqi_Delay = 1;
+		fine_fengmingqi = 1;
 	}
 	else
 	{
 		fengmingqi = 0;
-		Fengmingqi_Delay = 20;
+		fine_fengmingqi = 1;
 	}
 }
 
@@ -460,14 +510,23 @@ void NEW_serial()
 	{
 		Serial.print(1);
 		Serial.print(" ");
+		fine_fengmingqi = 1;
 	}
 	else
 	{
 		Serial.print(0);
 		Serial.print(" ");
+		fine_fengmingqi = 0;
 	}
 	Serial.println();
 	new_Delay(3000);
+}
+
+void Debug()
+{
+	Serial.print("(");
+	Serial.print(digitalRead(QW1), digitalRead(QW2));
+	Serial.print(")");
 }
 
 void setup()
