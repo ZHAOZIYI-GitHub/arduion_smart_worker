@@ -122,7 +122,7 @@ void send_data_Fire()
 void new_Delay(int Delay)//ÑÓÊ±º¯Êý
 {
 	int i;
-	for (i = 0; i<(Delay/Fengmingqi_Delay); i++)
+	for (i = 0; i<(Delay/50); i++)
 		fengmingqi1();
 }
 
