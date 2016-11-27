@@ -479,6 +479,8 @@ void NEW_serial()
 			}
 			else
 			{
+				//Serial.print(((Temperature_geter(DHT11PIN_IN) - Temperature_geter(DHT11PIN_OUT)) <= -10));
+				Serial.print("  ");
 			}
 		}
 
