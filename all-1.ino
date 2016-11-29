@@ -480,16 +480,26 @@ void NEW_serial()
 			else
 			{
 				//Serial.print(((Temperature_geter(DHT11PIN_IN) - Temperature_geter(DHT11PIN_OUT)) <= -10));
-				Serial.print("  ");
+				Serial.print("0");
+				Serial.print(" ");
+				goto qw7;
 			}
 		}
-
+		else
+		{
+			Serial.print("0");
+			Serial.print(" ");
+			goto qw8;
+		}
 	}
 	else 
 	{
 		Serial.print("0");
 		Serial.print(" ");
 	}
+
+	qw7:
+	qw8:
 	//心情
 	if (QW3[1] == 2)
 	{
@@ -544,14 +554,14 @@ void NEW_serial()
 	{
 		B_OpenTolight = 0;
 		Serial.print(D_OpenTolight);//2为开灯，1为关窗帘,0为无动作
-		Serial.print(" ");
+		//Serial.print(" ");
 		D_OpenTolight = 0;
 
 	}
 	else
 	{
 		Serial.print(0);
-		Serial.print(" ");
+		//Serial.print(" ");
 	}
 	Serial.println();
 	new_Delay(3000);
